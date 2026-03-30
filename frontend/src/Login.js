@@ -8,7 +8,7 @@ function Login({ setIsLoggedIn }) {
 
   const login = async () => {
     try {
-      const res = await axios.post("http://127.0.0.1:5000/login", {
+      const res = await axios.post("https://ai-medical-system-5olk.onrender.com/login", {
         username,
         password,
       });

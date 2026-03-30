@@ -16,7 +16,7 @@ function Dashboard() {
   const reportRef = useRef();
 
   const predict = async () => {
-    const res = await axios.post("http://127.0.0.1:5000/predict", {
+    const res = await axios.post("https://ai-medical-system-5olk.onrender.com/predict", {
       location,
       antibiotic,
       zone: parseInt(zone),
@@ -27,7 +27,7 @@ function Dashboard() {
   };
 
   const fetchHistory = async () => {
-    const res = await axios.get("http://127.0.0.1:5000/history");
+    const res = await axios.get("https://ai-medical-system-5olk.onrender.com/history");
     setHistory(res.data);
   };
 

@@ -4,15 +4,19 @@ import joblib
 import sqlite3
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # ==============================
 # 🔹 LOAD ML MODEL
 # ==============================
-model = joblib.load("model.pkl")
-le_location = joblib.load("location_encoder.pkl")
-le_antibiotic = joblib.load("antibiotic_encoder.pkl")
-le_result = joblib.load("result_encoder.pkl")
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+model = joblib.load(os.path.join(BASE_DIR, "model.pkl"))
+le_location = joblib.load(os.path.join(BASE_DIR, "location_encoder.pkl"))
+le_antibiotic = joblib.load(os.path.join(BASE_DIR, "antibiotic_encoder.pkl"))
+le_result = joblib.load(os.path.join(BASE_DIR, "result_encoder.pkl"))
 
 # ==============================
 # 🔹 INIT DATABASE
@@ -154,4 +158,4 @@ def home():
 # 🚀 RUN SERVER
 # ==============================
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
