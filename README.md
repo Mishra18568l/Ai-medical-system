@@ -13,7 +13,7 @@ This project helps doctors and researchers quickly analyze potential resistance 
 # 🚀 Live Demo
 
 Frontend (User Interface):
-https://ai-medical-system-roan.vercel.app/
+ai-medical-system-git-main-vikash-mishras-projects-d6beb2a0.vercel.app
 
 Backend API:
 https://ai-medical-system-5olk.onrender.com/
