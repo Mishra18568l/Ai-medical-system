@@ -2,7 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Sidebar from "./Sidebar";
 import "./App.css";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+} from "recharts";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -15,49 +23,93 @@ function Dashboard() {
 
   const reportRef = useRef();
 
-  const predict = async () => {
-    const res = await axios.post("https://ai-medical-system-5olk.onrender.com/predict", {
-      location,
-      antibiotic,
-      zone: parseInt(zone),
-    });
+  // 🔗 Backend URL (change if needed)
+  const API = "https://ai-medical-system-5olk.onrender.com";
 
-    setResult(res.data.prediction);
-    fetchHistory();
+  // 🔮 Predict
+  const predict = async () => {
+    try {
+      const res = await axios.post(`${API}/predict`, {
+        location,
+        antibiotic,
+        zone: parseInt(zone),
+      });
+
+      setResult(res.data.prediction);
+      fetchHistory();
+    } catch (err) {
+      alert("Prediction failed!");
+      console.error(err);
+    }
   };
 
+  // 📊 Fetch history
   const fetchHistory = async () => {
-    const res = await axios.get("https://ai-medical-system-5olk.onrender.com/history");
-    setHistory(res.data);
+    try {
+      const res = await axios.get(`${API}/history`);
+      setHistory(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
     fetchHistory();
   }, []);
 
-  // 📄 PDF DOWNLOAD
+  // 📄 DOWNLOAD PDF (FIXED)
   const downloadPDF = () => {
-    html2canvas(reportRef.current).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, "PNG", 10, 10);
-      pdf.save("report.pdf");
-    });
+    const input = reportRef.current;
+
+    if (!input) {
+      alert("Report not ready!");
+      return;
+    }
+
+    setTimeout(() => {
+      html2canvas(input, {
+        scale: 2,
+        useCORS: true,
+      }).then((canvas) => {
+        const imgData = canvas.toDataURL("image/png");
+
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        const imgWidth = 190;
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let heightLeft = imgHeight;
+        let position = 10;
+
+        pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        pdf.save("AI_Medical_Report.pdf");
+      });
+    }, 500);
   };
 
   return (
     <div className="main">
       <Sidebar />
 
-      <div className="content fade-in" ref={reportRef}>
+      <div className="content fade-in">
         <h1>Doctor Dashboard</h1>
 
-        {/* KPI CARDS */}
+        {/* KPI */}
         <div className="kpi-container">
-  <div className="kpi fade-in">Total Cases: {history.length}</div>
-  <div className="kpi fade-in">Last Result: {result}</div>
-  <div className="kpi fade-in">Status: Active</div>
-</div>
+          <div className="kpi">Total Cases: {history.length}</div>
+          <div className="kpi">Last Result: {result}</div>
+          <div className="kpi">Status: Active</div>
+        </div>
 
         {/* INPUT */}
         <div className="card">
@@ -77,11 +129,18 @@ function Dashboard() {
             <option>CIPROFLOXACIN</option>
           </select>
 
-          <input placeholder="Zone" onChange={(e) => setZone(e.target.value)} />
+          <input
+            placeholder="Zone"
+            onChange={(e) => setZone(e.target.value)}
+          />
 
           <button onClick={predict}>Predict</button>
 
-          <h2 style={{ color: result === "Susceptible" ? "#00ff9f" : "#ff4d4d" }}>
+          <h2
+            style={{
+              color: result === "Susceptible" ? "#00ff9f" : "#ff4d4d",
+            }}
+          >
             {result}
           </h2>
         </div>
@@ -100,7 +159,7 @@ function Dashboard() {
           </BarChart>
         </div>
 
-        {/* HISTORY TABLE */}
+        {/* HISTORY */}
         <div className="card">
           <h3>Patient History</h3>
 
@@ -125,6 +184,29 @@ function Dashboard() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* 📄 CLEAN REPORT (FOR PDF) */}
+        <div
+          ref={reportRef}
+          style={{
+            background: "#fff",
+            color: "#000",
+            padding: "20px",
+            marginTop: "20px",
+          }}
+        >
+          <h1 style={{ textAlign: "center" }}>AI Medical Report</h1>
+          <hr />
+
+          <p><b>Location:</b> {location}</p>
+          <p><b>Antibiotic:</b> {antibiotic}</p>
+          <p><b>Zone:</b> {zone}</p>
+          <p><b>Result:</b> {result}</p>
+
+          <p style={{ marginTop: "20px" }}>
+            Generated on: {new Date().toLocaleString()}
+          </p>
         </div>
 
         <button onClick={downloadPDF}>Download Report</button>
