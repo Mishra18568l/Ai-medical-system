@@ -16,7 +16,7 @@ Frontend (User Interface):
 https://ai-medical-system-roan.vercel.app/
 
 Backend API:
-https://ai-medical-system.onrender.com
+https://ai-medical-system-5olk.onrender.com/
 
 ---
 
