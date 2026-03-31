@@ -1,4 +1,4 @@
-# Live Demo: https://your-vercel-link
+# Live Demo: ai-medical-system-roan.vercel.app
 
 # Login: doctor / 1234
 
@@ -13,7 +13,7 @@ This project helps doctors and researchers quickly analyze potential resistance 
 # 🚀 Live Demo
 
 Frontend (User Interface):
-https://your-frontend-url.vercel.app
+ai-medical-system-roan.vercel.app
 
 Backend API:
 https://ai-medical-system.onrender.com
